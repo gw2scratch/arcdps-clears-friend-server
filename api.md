@@ -206,11 +206,11 @@ The subtoken urls have to be restricted, and have to include the following urls:
 - /v2/account – used to access account name, this is never shared further to avoid impersonation
 - /v2/account/achievements – may be used in the future to add features that require checking achievements
 - /v2/account/dungeons – may be used in the future for dungeon clears
-- /v2/account/worldbosses – may be used in the future for world boss clears (unlikely)
-- /v2/account/createsubtoken – used to further restrict information when sharing to friends
 - /v2/account/masteries – used to access the `last_modified` information with minimal information leaks about the
   account.
 - /v2/account/raids – used to access raid clear status
+- /v2/account/worldbosses – may be used in the future for world boss clears (unlikely)
+- /v2/createsubtoken – used to further restrict information when sharing to friends
 
 The token is rejected with status code 400 if these requirements are not fulfilled.
 
