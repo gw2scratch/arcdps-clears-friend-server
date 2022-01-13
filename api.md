@@ -35,7 +35,8 @@ Note that the hashes also identify keys in responses.
 
 The API is used to get subtokens that may be used to request clears of your friends from the API. These subtokens are
 heavily restricted. They have a short expiration time (a day or so) to make it possible to revoke access for users
-without deleting an API key. You may have to request the key again when it expires.
+without deleting an API key. You may have to request the key again when it's about to expire – the server guarantees
+having a new subtoken ready 1 hour before expiration.
 
 They keys only allow the following endpoints:
 
@@ -43,7 +44,18 @@ They keys only allow the following endpoints:
   account.
 - /v2/account/raids – used to access raid clear data
 
-Note that in future, more endpoints may be added to support new features (such dungeon clears and similar).
+Note that in future, more endpoints may be added to support new features (such as dungeon clears and similar).
+
+### Public clears
+
+Users may set a key to be have one of two privacy settings:
+
+- private – subtokens may only be accessed by friends (sharing to their account is required)
+- public – anyone may request the subtoken
+
+A list of public friends will be returned as part of the [state](#State).
+This done by providing `x-public-friends` as a header with a comma-separated list of account names (without leading `:`)
+Alternatively, you may provide multiple `x-public-friends` headers, each containing one account name.
 
 ## State
 
@@ -68,14 +80,16 @@ Note that no friends may be retrieved before adding a subtoken, as it is needed 
       "shared_to": [],
       "subtoken_added_at": null,
       "subtoken_expires_at": null,
-      "account": null
+      "account": null,
+      "public": false
     },
     {
       "key_hash": "4355a46b19d348dc2f57c046f8ef63d4538ebb936000f3c9ee954a27460dd865",
       "shared_to": [],
       "subtoken_added_at": null,
       "subtoken_expires_at": null,
-      "account": null
+      "account": null,
+      "public": false
     }
   ],
   "friends": []
@@ -106,14 +120,16 @@ One of these friends does not have a subtoken available.
       ],
       "subtoken_added_at": "2020-03-28T16:29:04.644008111Z",
       "subtoken_expires_at": "2021-03-28T16:29:04.644008111Z",
-      "account": "OurAccount.1234"
+      "account": "OurAccount.1234",
+      "public": false
     },
     {
       "key_hash": "4355a46b19d348dc2f57c046f8ef63d4538ebb936000f3c9ee954a27460dd865",
       "shared_to": [],
       "subtoken_added_at": "2020-03-28T16:30:04.644008111Z",
       "subtoken_expires_at": "2021-03-28T16:30:04.644008111Z",
-      "account": "OurAccount.5678"
+      "account": "OurAccount.5678",
+      "public": false
     }
   ],
   "friends": []
@@ -122,7 +138,10 @@ One of these friends does not have a subtoken available.
 
 ### Example: with friends
 
-This is an example that includes some subtokens for friends that were shared with one of our `x-auth-keys`.
+This is an example that includes some subtokens for friends that were shared with one of our `x-auth-keys`. 
+
+It also includes a request for one public friend that is available and one that is
+not: `x-public-friends: Friend.9876,FriendWithTypo.1234`.
 
 ```json
 {
@@ -132,33 +151,60 @@ This is an example that includes some subtokens for friends that were shared wit
       "shared_to": [],
       "subtoken_added_at": "2020-03-28T16:29:04.644008111Z",
       "subtoken_expires_at": "2021-03-28T16:29:04.644008111Z",
-      "account": "OurAccount.1234"
+      "account": "OurAccount.1234",
+      "public": false
     },
     {
       "key_hash": "4355a46b19d348dc2f57c046f8ef63d4538ebb936000f3c9ee954a27460dd865",
       "shared_to": [],
       "subtoken_added_at": "2020-03-28T16:30:04.644008111Z",
       "subtoken_expires_at": "2021-03-28T16:30:04.644008111Z",
-      "account": "OurAccount.5678"
+      "account": "OurAccount.5678",
+      "public": false
     }
   ],
   "friends": [
     {
       "account": "Friend.1234",
-      "subtoken": "long.jwt.token.here",
-      "expires_at": "2021-04-28T17:25:00.181828132Z",
+      "subtoken": {
+        "subtoken": "long.jwt.token.here",
+        "expires_at": "2021-04-28T17:25:00.181828132Z"
+      },
+      "public": false,
+      "known": true,
       "shared_with": [
         "01ba4719c80b6fe911b091a7c05124b64eeece964e09c058ef8f9805daca546b"
       ]
     },
     {
       "account": "Friend.5678",
-      "subtoken": "another.long.jwt.token.here",
-      "expires_at": "2021-04-28T17:45:00.000000000Z",
+      "subtoken": {
+        "subtoken": "another.long.jwt.token.here",
+        "expires_at": "2021-04-28T17:45:00.000000000Z"
+      },
+      "public": false,
+      "known": true,
       "shared_with": [
         "01ba4719c80b6fe911b091a7c05124b64eeece964e09c058ef8f9805daca546b",
         "4355a46b19d348dc2f57c046f8ef63d4538ebb936000f3c9ee954a27460dd865"
       ]
+    },
+    {
+      "account": "Friend.9876",
+      "subtoken": {
+        "subtoken": "yet.another.long.jwt.token.here",
+        "expires_at": "2021-04-28T17:55:00.000000000Z"
+      },
+      "known": true,
+      "public": true,
+      "shared_with": []
+    },
+    {
+      "account": "FriendWithTypo.1234",
+      "subtoken": null,
+      "public": true,
+      "known": false,
+      "shared_with": []
     }
   ]
 }
@@ -172,6 +218,7 @@ The API supports the following endpoints:
 - POST /key/add
 - POST /key/share
 - POST /key/unshare
+- POST /key/public
 
 ### GET /state
 
@@ -233,3 +280,12 @@ subtoken expiration times.
 - `key_hash` – key hash
 - `account` – account name of the friend; having an api key with this account name is no longer sufficient to gain
   access
+- 
+### POST /key/public
+
+Configures accessibility of subtokens.
+
+#### Params
+
+- `key_hash` – key hash
+- `public` – false/true
