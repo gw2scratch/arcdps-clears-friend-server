@@ -81,7 +81,8 @@ Note that no friends may be retrieved before adding a subtoken, as it is needed 
       "subtoken_added_at": null,
       "subtoken_expires_at": null,
       "account": null,
-      "public": false
+      "public": false,
+      "disabled": false
     },
     {
       "key_hash": "4355a46b19d348dc2f57c046f8ef63d4538ebb936000f3c9ee954a27460dd865",
@@ -89,7 +90,8 @@ Note that no friends may be retrieved before adding a subtoken, as it is needed 
       "subtoken_added_at": null,
       "subtoken_expires_at": null,
       "account": null,
-      "public": false
+      "public": false,
+      "disabled": false
     }
   ],
   "friends": []
@@ -121,7 +123,8 @@ One of these friends does not have a subtoken available.
       "subtoken_added_at": "2020-03-28T16:29:04.644008111Z",
       "subtoken_expires_at": "2021-03-28T16:29:04.644008111Z",
       "account": "OurAccount.1234",
-      "public": false
+      "public": false,
+      "disabled": false
     },
     {
       "key_hash": "4355a46b19d348dc2f57c046f8ef63d4538ebb936000f3c9ee954a27460dd865",
@@ -129,7 +132,8 @@ One of these friends does not have a subtoken available.
       "subtoken_added_at": "2020-03-28T16:30:04.644008111Z",
       "subtoken_expires_at": "2021-03-28T16:30:04.644008111Z",
       "account": "OurAccount.5678",
-      "public": false
+      "public": false,
+      "disabled": false
     }
   ],
   "friends": []
@@ -152,7 +156,8 @@ not: `x-public-friends: Friend.9876,FriendWithTypo.1234`.
       "subtoken_added_at": "2020-03-28T16:29:04.644008111Z",
       "subtoken_expires_at": "2021-03-28T16:29:04.644008111Z",
       "account": "OurAccount.1234",
-      "public": false
+      "public": false,
+      "disabled": false
     },
     {
       "key_hash": "4355a46b19d348dc2f57c046f8ef63d4538ebb936000f3c9ee954a27460dd865",
@@ -160,7 +165,8 @@ not: `x-public-friends: Friend.9876,FriendWithTypo.1234`.
       "subtoken_added_at": "2020-03-28T16:30:04.644008111Z",
       "subtoken_expires_at": "2021-03-28T16:30:04.644008111Z",
       "account": "OurAccount.5678",
-      "public": false
+      "public": false,
+      "disabled": false
     }
   ],
   "friends": [
@@ -288,4 +294,5 @@ Configures accessibility of subtokens.
 #### Params
 
 - `key_hash` – key hash
-- `public` – false/true
+- `public` – false if only friends may access, true if anyone may access subtokens
+- `disabled` - if true, nobody may access (regardless of friend settings)
